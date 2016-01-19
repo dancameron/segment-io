@@ -1,3 +1,7 @@
+= 1.2 =
+
+Going free!
+
 = 1.1 =
 
 * Minor Updates

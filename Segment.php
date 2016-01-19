@@ -7,11 +7,11 @@
  * @package SI
  */
 
-if ( !defined( 'EDD_Segment_FREE_TEST' ) )
-	define( 'EDD_Segment_FREE_TEST', FALSE );
+if ( ! defined( 'EDD_Segment_FREE_TEST' ) ) {
+	define( 'EDD_Segment_FREE_TEST', false ); }
 
-if ( !defined( 'EDD_SEGMENT_DEV' ) )
-	define( 'EDD_SEGMENT_DEV', FALSE );
+if ( ! defined( 'EDD_SEGMENT_DEV' ) ) {
+	define( 'EDD_SEGMENT_DEV', false ); }
 
 abstract class EDD_Segment {
 
@@ -26,7 +26,7 @@ abstract class EDD_Segment {
 	/**
 	 * Current version. Should match sprout-invoices.php plugin version.
 	 */
-	const EDD_Segment_VERSION = '1.0';
+	const EDD_Segment_VERSION = '1.2';
 	/**
 	 * DB Version
 	 */
@@ -66,8 +66,8 @@ abstract class EDD_Segment {
 
 	/**
 	 * Wrapper around esc_attr__
-	 * @param  string $string 
-	 * @return          
+	 * @param  string $string
+	 * @return
 	 */
 	public static function esc__( $string ) {
 		return esc_attr__( $string, self::TEXT_DOMAIN );
@@ -75,8 +75,8 @@ abstract class EDD_Segment {
 
 	/**
 	 * Wrapper around esc_attr__
-	 * @param  string $string 
-	 * @return          
+	 * @param  string $string
+	 * @return
 	 */
 	public static function esc_e( $string ) {
 		return esc_attr_e( $string, self::TEXT_DOMAIN );
