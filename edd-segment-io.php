@@ -2,7 +2,7 @@
 
 /**
  * @package EDD_Segment
- * @version 0.1
+ * @version 1.2
  */
 
 /*
@@ -10,7 +10,7 @@
  * Plugin URI: https://sproutapps.co/edd-segment/
  * Description: Hooks up your EDD run site with Segment and/or Customer.io. Learn more at <a href="https://sproutapps.co/edd-segment-io">Sprout Apps</a>.
  * Author: Sprout Apps
- * Version: 1.1
+ * Version: 1.2
  * Author URI: https://sproutapps.co
  * Text Domain: sprout-apps
  * Domain Path: languages
@@ -61,7 +61,7 @@ function edd_segment_plugin_deactivated() {
 }
 
 function edd_segment_deactivate_plugin() {
-	if ( is_admin() && ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) ) {
+	if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 		require_once ABSPATH.'/wp-admin/includes/plugin.php';
 		deactivate_plugins( __FILE__ );
 	}
