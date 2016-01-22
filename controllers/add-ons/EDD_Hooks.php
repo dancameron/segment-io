@@ -141,18 +141,21 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 	 * Find old pending carts and consider them abandoned.
 	 * @return null
 	 */
-	function find_old_abandoned_carts() {
+	public static function find_old_abandoned_carts() {
 		$time = time();
 		$thirty_mins_ago = $time - apply_filters( 'find_old_abandoned_carts_mins_ago', 1800 ); // a half hour
 
 		$args = array(
-			'status' => 'pending',
+			'status' => array( 'abandoned', 'pending' ),
 			'start_date' => $thirty_mins_ago,
 			'end_date' => $time,
 		);
 
 		$pending_payments  = new EDD_Payments_Query( $args );
 		$payments = $pending_payments->get_payments();
+		if ( empty( $payments ) ) {
+			return;
+		}
 		foreach ( $payments as $payment ) {
 			$payment_id = $payment->ID;
 			$user_id = edd_get_payment_user_id( $payment_id );
