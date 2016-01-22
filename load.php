@@ -3,7 +3,7 @@
 /**
  * Load the SI application
  * (function called at the bottom of this page)
- * 
+ *
  * @package EDD_Segment
  * @return void
  */
@@ -26,7 +26,7 @@ function edd_segment_load() {
 	require_once EDD_SEGMENT_PATH.'/controllers/_Controller.php';
 	EDD_Segment_Controller::init();
 
-	if ( !class_exists( 'SA_Settings_API' ) ) {
+	if ( ! class_exists( 'SA_Settings_API' ) ) {
 		require_once EDD_SEGMENT_PATH.'/controllers/_Settings.php';
 		SA_Settings_API::init();
 	}
@@ -48,10 +48,8 @@ function edd_segment_load() {
 		EDD_Segment_AJAX_Callbacks::init();
 	}
 
-	if ( function_exists( 'EDD_Payments_Query' ) ) {
-		require_once EDD_SEGMENT_PATH.'/controllers/add-ons/EDD_Hooks.php';
-		EDD_Segment_Hooks::init();
-	}
+	require_once EDD_SEGMENT_PATH.'/controllers/add-ons/EDD_Hooks.php';
+	EDD_Segment_Hooks::init();
 
 	require_once EDD_SEGMENT_PATH.'/controllers/Updates.php';
 	EDD_Segment_Updates::init();
@@ -82,10 +80,10 @@ if ( EDD_SEGMENT_SUPPORTED_WP_VERSION && EDD_SEGMENT_SUPPORTED_PHP_VERSION ) {
 	edd_segment_deactivate_plugin();
 	add_action( 'admin_head', 'edd_segment_fail_notices' );
 	function edd_segment_fail_notices() {
-		if ( !EDD_SEGMENT_SUPPORTED_WP_VERSION ) {
+		if ( ! EDD_SEGMENT_SUPPORTED_WP_VERSION ) {
 			printf( '<div class="error"><p><strong>EDD Segment</strong> requires WordPress %s or higher. Please upgrade WordPress and activate the EDD Segment Plugin again.</p></div>', EDD_SEGMENT_SUPPORTED_WP_VERSION );
 		}
-		if ( !EDD_SEGMENT_SUPPORTED_PHP_VERSION ) {
+		if ( ! EDD_SEGMENT_SUPPORTED_PHP_VERSION ) {
 			printf( '<div class="error"><p><strong>EDD Segment</strong> requires PHP version %s or higher to be installed on your server. Talk to your web host about using a secure version of PHP.</p></div>', EDD_SEGMENT_SUPPORTED_PHP_VERSION );
 		}
 	}
