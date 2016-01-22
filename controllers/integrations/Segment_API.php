@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * EDD Segment API Controller
@@ -18,20 +18,20 @@ class EDD_Segment_Tracker extends EDD_Segment_Controller {
 	}
 
 	public static function load_segment_api() {
-		if ( !class_exists('Analytics' ) ) {
+		if ( ! class_exists( 'Analytics' ) ) {
 			require_once EDD_SEGMENT_PATH.'/lib/segment-php/lib/Segment.php';
-			class_alias('Segment', 'Analytics');
+			class_alias( 'Segment', 'Analytics' );
 			Analytics::init( self::$write_key );
 		}
 	}
 
 	public static function identify( $user_id = 0, $traits = array() ) {
-		if ( !$user_id && is_user_logged_in() ) {
+		if ( ! $user_id && is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 		}
 
 		// A user is necessary
-		if ( !$user_id ) {
+		if ( ! $user_id ) {
 			return;
 		}
 
@@ -41,7 +41,7 @@ class EDD_Segment_Tracker extends EDD_Segment_Controller {
 		if ( is_a( $user, 'WP_User' ) ) {
 			$user_traits = array(
 				'name' => $user->first_name .  ' ' . $user->last_name,
-				'email' => $user->user_email
+				'email' => $user->user_email,
 				);
 		}
 		// merge with existing
@@ -55,8 +55,8 @@ class EDD_Segment_Tracker extends EDD_Segment_Controller {
 		self::load_segment_api();
 		Analytics::identify( array(
 			'userId' => $user_id,
-			'traits' => $traits
-			) );
+			'traits' => $traits,
+		) );
 	}
 
 	public static function track( $user_id = 0, $event = '', $props = array() ) {
@@ -65,12 +65,12 @@ class EDD_Segment_Tracker extends EDD_Segment_Controller {
 			return;
 		}
 
-		if ( !$user_id && is_user_logged_in() ) {
+		if ( ! $user_id && is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 		}
 
 		// A user is necessary
-		if ( !$user_id ) {
+		if ( ! $user_id ) {
 			return;
 		}
 
@@ -78,8 +78,7 @@ class EDD_Segment_Tracker extends EDD_Segment_Controller {
 		Analytics::track( array(
 			'userId' => $user_id,
 			'event' => $event,
-			'properties' => $props
-			) );
+			'properties' => $props,
+		) );
 	}
-
 }

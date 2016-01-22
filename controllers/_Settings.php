@@ -65,7 +65,7 @@ class SA_Settings_API extends EDD_Segment_Controller {
 		//////////////////
 		// Meta Box API //
 		//////////////////
-		
+
 		// Register meta box
 		add_action( 'sprout_meta_box', array( __CLASS__, 'register_meta_box' ), 10, 2 );
 
@@ -97,23 +97,23 @@ class SA_Settings_API extends EDD_Segment_Controller {
 			'slug' => 'undefined_slug',
 			'title' => 'Undefined Title',
 			'menu_title' => 'Undefined Menu Title',
-			'tab_title' => FALSE,
+			'tab_title' => false,
 			'weight' => 10,
-			'reset' => FALSE, 
-			'section' => 'theme', 
-			'show_tabs' => TRUE,
-			'tab_only' => FALSE,
-			'callback' => NULL,
-			'ajax' => FALSE,
-			'ajax_full_page' => FALSE,
+			'reset' => false,
+			'section' => 'theme',
+			'show_tabs' => true,
+			'tab_only' => false,
+			'callback' => null,
+			'ajax' => false,
+			'ajax_full_page' => false,
 			'add_new' => '',
-			'add_new_post_type' => ''
+			'add_new_post_type' => '',
 		);
 		$parsed_args = wp_parse_args( $args, $defaults );
 		extract( $parsed_args );
 
 		$page = self::TEXT_DOMAIN.'/'.$slug;
-		self::$option_tabs[$slug] = array(
+		self::$option_tabs[ $slug ] = array(
 			'slug' => $slug,
 			'title' => $menu_title,
 			'tab_title' => ( $tab_title ) ? $tab_title : $menu_title,
@@ -125,8 +125,8 @@ class SA_Settings_API extends EDD_Segment_Controller {
 			'callback' => $callback,
 			'tab_only' => $tab_only,
 		);
-		if ( !$tab_only ) {
-			self::$admin_pages[$page] = array(
+		if ( ! $tab_only ) {
+			self::$admin_pages[ $page ] = array(
 				'parent' => $parent,
 				'title' => $title,
 				'menu_title' => $menu_title,
@@ -136,28 +136,27 @@ class SA_Settings_API extends EDD_Segment_Controller {
 				'reset' => $reset,
 				'tab_only' => $tab_only,
 				'section' => $section,
-				'callback' => $callback
+				'callback' => $callback,
 			);
 		}
-		
-		
+
 		return $page;
 	}
 
 	/**
-	 * Register settings from action 
-	 * @param  array  $settings 
-	 * @param  string $page     
-	 * @return            
+	 * Register settings from action
+	 * @param  array  $settings
+	 * @param  string $page
+	 * @return
 	 */
 	public static function register_settings( $settings = array(), $page = '' ) {
 		if ( $page == '' ) {
 			$page = self::SETTINGS_PAGE;
 		}
-		if ( !isset( self::$options[$page] ) ) {
-			self::$options[$page] = array();
+		if ( ! isset( self::$options[ $page ] ) ) {
+			self::$options[ $page ] = array();
 		}
-		self::$options[$page] = wp_parse_args( self::$options[$page], $settings );
+		self::$options[ $page ] = wp_parse_args( self::$options[ $page ], $settings );
 	}
 
 	/**
@@ -167,11 +166,11 @@ class SA_Settings_API extends EDD_Segment_Controller {
 	 * @return void
 	 */
 	public static function add_admin_page() {
-		
+
 		// Add parent menu for SI
 		self::$settings_page = add_menu_page( self::__( 'Sprout Apps' ), self::__( 'Sprout Apps' ), 'manage_options', self::TEXT_DOMAIN );
 		add_submenu_page( self::TEXT_DOMAIN, self::__( 'Sprout Apps' ), self::__( 'Sprout Apps' ), 'manage_options', self::TEXT_DOMAIN, array( __CLASS__, 'dashboard_page' ) );
-		
+
 		// Sort submenus
 		uasort( self::$admin_pages, array( __CLASS__, 'sort_by_weight' ) );
 		// Add submenus
@@ -179,7 +178,7 @@ class SA_Settings_API extends EDD_Segment_Controller {
 			$parent = ( $data['parent'] != '' ) ? $data['parent'] : self::TEXT_DOMAIN ;
 			$callback = ( is_callable( $data['callback'] ) ) ? $data['callback'] : array( __CLASS__, 'default_admin_page' ) ;
 			$hook = add_submenu_page( $parent, $data['title'], self::__( $data['menu_title'] ), 'manage_options', $page, $callback );
-			self::$admin_pages[$page]['hook'] = $hook;
+			self::$admin_pages[ $page ]['hook'] = $hook;
 		}
 	}
 
@@ -194,7 +193,7 @@ class SA_Settings_API extends EDD_Segment_Controller {
 	 * @return void
 	 */
 	public static function default_admin_page() {
-		if ( !current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return; // not allowed to view this page
 		}
 		if ( isset( $_GET['settings-updated'] ) && isset( $_GET['settings-updated'] ) ) {
@@ -203,46 +202,45 @@ class SA_Settings_API extends EDD_Segment_Controller {
 		}
 		if ( isset( $_GET['tab'] ) && $_GET['tab'] != '' ) {
 			$tabs = apply_filters( 'si_option_tabs', self::$option_tabs );
-			if ( isset( $tabs[$_GET['tab']] ) ) {
-				$tab_args = $tabs[$_GET['tab']];
+			if ( isset( $tabs[ $_GET['tab'] ] ) ) {
+				$tab_args = $tabs[ $_GET['tab'] ];
 				if ( isset( $tab_args['callback'] ) && is_callable( $tab_args['callback'] ) ) {
 					call_user_func_array( $tab_args['callback'], array() );
-				}
-				else {
+				} else {
 					$plugin_page = $_GET['page'];
 					$title = ( isset( $tabs['title'] ) ) ? $tabs['title'] : '' ;
-					$ajax = isset($tabs['ajax'])?$tabs['ajax']:'';
-					$ajax_full_page = isset($tabs['ajax_full_page'])?$tabs['ajax_full_page']:'';
-					$reset = isset($tabs['reset'])?$tabs['reset']:'';
-					$section = isset($tabs['section'])?$tabs['section']:'';
+					$ajax = isset( $tabs['ajax'] )?$tabs['ajax']:'';
+					$ajax_full_page = isset( $tabs['ajax_full_page'] )?$tabs['ajax_full_page']:'';
+					$reset = isset( $tabs['reset'] )?$tabs['reset']:'';
+					$section = isset( $tabs['section'] )?$tabs['section']:'';
 
 					self::load_view( 'admin/settings', array(
-						'title' => self::__($title),
+						'title' => self::__( $title ),
 						'page' => $plugin_page,
 						'ajax' => $ajax,
 						'ajax_full_page' => $ajax_full_page,
 						'reset' => $reset,
-						'section' => $section
-					), FALSE );
+						'section' => $section,
+					), false );
 				}
 				return;
 			}
 		}
 		$plugin_page = $_GET['page'];
-		$title = ( isset( self::$admin_pages[$plugin_page]['title'] ) ) ? self::$admin_pages[$plugin_page]['title'] : '' ;
-		$ajax = isset(self::$admin_pages[$plugin_page]['ajax'])?self::$admin_pages[$plugin_page]['ajax']:'';
-		$ajax_full_page = isset(self::$admin_pages[$plugin_page]['ajax_full_page'])?self::$admin_pages[$plugin_page]['ajax_full_page']:'';
-		$reset = isset(self::$admin_pages[$plugin_page]['reset'])?self::$admin_pages[$plugin_page]['reset']:'';
-		$section = isset(self::$admin_pages[$plugin_page]['section'])?self::$admin_pages[$plugin_page]['section']:'';
+		$title = ( isset( self::$admin_pages[ $plugin_page ]['title'] ) ) ? self::$admin_pages[ $plugin_page ]['title'] : '' ;
+		$ajax = isset( self::$admin_pages[ $plugin_page ]['ajax'] )?self::$admin_pages[ $plugin_page ]['ajax']:'';
+		$ajax_full_page = isset( self::$admin_pages[ $plugin_page ]['ajax_full_page'] )?self::$admin_pages[ $plugin_page ]['ajax_full_page']:'';
+		$reset = isset( self::$admin_pages[ $plugin_page ]['reset'] )?self::$admin_pages[ $plugin_page ]['reset']:'';
+		$section = isset( self::$admin_pages[ $plugin_page ]['section'] )?self::$admin_pages[ $plugin_page ]['section']:'';
 
 		self::load_view( 'admin/settings', array(
-				'title' => self::__($title),
+				'title' => self::__( $title ),
 				'page' => $plugin_page,
 				'ajax' => $ajax,
 				'ajax_full_page' => $ajax_full_page,
 				'reset' => $reset,
-				'section' => $section
-			), FALSE );
+				'section' => $section,
+		), false );
 		return;
 	}
 
@@ -252,27 +250,27 @@ class SA_Settings_API extends EDD_Segment_Controller {
 	 * @return string              html
 	 */
 	public static function display_settings_tabs( $plugin_page = 0 ) {
-		if ( !$plugin_page ) {
+		if ( ! $plugin_page ) {
 			$plugin_page = ( $_GET['page'] == self::TEXT_DOMAIN ) ? self::TEXT_DOMAIN . '/settings' : $_GET['page'] ;
 		}
 		// Section based on settings slug
-		$section = self::$admin_pages[$plugin_page]['section'];
+		$section = self::$admin_pages[ $plugin_page ]['section'];
 		// get all tabs and sort
 		$tabs = apply_filters( 'si_option_tabs', self::$option_tabs );
 		uasort( $tabs, array( __CLASS__, 'sort_by_weight' ) );
 		// loop through tabs and build markup
-		foreach ( $tabs as $key => $data ):
+		foreach ( $tabs as $key => $data ) :
 			if ( $data['section'] == $section ) {
 				$new_title = self::__( $data['tab_title'] );
-				$current = ( ( isset( $_GET['tab'] ) && $_GET['tab'] ==  $data['slug'] ) || ( !isset( $_GET['tab'] ) && str_replace( self::TEXT_DOMAIN . '/', '', $plugin_page ) ==  $data['slug'] ) ) ? ' nav-tab-active' : '';
-				$url = ( $data['tab_only'] ) ? add_query_arg( array( 'page' => self::TEXT_DOMAIN.'/settings', 'tab' => $data['slug'] ), 'admin.php' ) : add_query_arg( array( 'page' => self::TEXT_DOMAIN.'/settings' ), 'admin.php' ) ;
+				$current = ( ( isset( $_GET['tab'] ) && $_GET['tab'] == $data['slug'] ) || ( ! isset( $_GET['tab'] ) && str_replace( self::TEXT_DOMAIN . '/', '', $plugin_page ) == $data['slug'] ) ) ? ' nav-tab-active' : '';
+				$url = ( $data['tab_only'] ) ? add_query_arg( array( 'page' => self::TEXT_DOMAIN.'/settings', 'tab' => $data['slug'] ), 'admin.php' ) : add_query_arg( array( 'page' => self::TEXT_DOMAIN.'/settings' ), 'admin.php' );
 				echo '<a href="'.$url.'" class="nav-tab'.$current.'" id="si_options_tab_'.$data['slug'].'">'.$new_title.'</a>';
 			}
 		endforeach;
 		// Add the add new buttons after the tabs
-		foreach ( $tabs as $key => $data ):
+		foreach ( $tabs as $key => $data ) :
 			if ( $data['add_new'] && isset( $data['add_new_post_type'] ) ) {
-				$post_new_file = "post-new.php?post_type=" . $data['add_new_post_type'];
+				$post_new_file = 'post-new.php?post_type=' . $data['add_new_post_type'];
 				echo ' <a href="' . esc_url( admin_url( $post_new_file ) ) . '" class="add-new-h2">' . esc_html( $data['add_new'] ) . '</a>';
 			}
 		endforeach;
@@ -324,8 +322,8 @@ class SA_Settings_API extends EDD_Segment_Controller {
 
 	/**
 	 * Full option field.
-	 * @param  array $args 
-	 * @return        
+	 * @param  array $args
+	 * @return
 	 */
 	public static function option_field( $args ) {
 		$name = $args['name'];
@@ -333,11 +331,10 @@ class SA_Settings_API extends EDD_Segment_Controller {
 		if ( $args['option']['type'] != 'checkbox' ) {
 			$out .= self::setting_form_label( $name, $args['option'] );
 			$out .= self::setting_form_field( $name, $args['option'] );
-		}
-		else {
+		} else {
 			$label = ( isset( $args['option']['label'] ) ) ? $args['option']['label'] : '' ;
 			$out .= '<label for="'.$name.'">'.self::setting_form_field( $name, $args['option'] ).' '.$label.'</label>';
-			if ( !empty( $args['option']['description'] ) ) {
+			if ( ! empty( $args['option']['description'] ) ) {
 				$out .= '<p class="description help_block">'.$args['option']['description'].'</p>';
 			}
 		}
@@ -346,89 +343,89 @@ class SA_Settings_API extends EDD_Segment_Controller {
 
 	/**
 	 * Setting field label
-	 * @param  string $name 
-	 * @param  array $data 
-	 * @return        
+	 * @param  string $name
+	 * @param  array $data
+	 * @return
 	 */
 	public static function setting_form_label( $name, $data ) {
 		$out = '';
 		if ( isset( $data['label'] ) ) {
-			$out = '<label for="'.$name.'">'.$data['label'].'</label>';	
+			$out = '<label for="'.$name.'">'.$data['label'].'</label>';
 		}
 		return apply_filters( 'si_admin_settings_form_label', $out, $name, $data );
 	}
 
 	/**
 	 * Settings form field
-	 * @param  string $name 
-	 * @param  array $data 
-	 * @return        
+	 * @param  string $name
+	 * @param  array $data
+	 * @return
 	 */
 	public static function setting_form_field( $name, $data ) {
-		if ( !isset( $data['attributes'] ) || !is_array( $data['attributes'] ) ) {
+		if ( ! isset( $data['attributes'] ) || ! is_array( $data['attributes'] ) ) {
 			$data['attributes'] = array();
 		}
-		if ( !isset( $data['default'] ) ) {
+		if ( ! isset( $data['default'] ) ) {
 			$data['default'] = '';
 		}
 		ob_start(); ?>
 
-		<?php if ( $data['type'] == 'textarea' ): ?>
-			<textarea type="textarea" name="<?php echo $name; ?>" id="<?php echo $name; ?>" rows="<?php echo isset( $data['rows'] )?$data['rows']:4; ?>" cols="<?php echo isset( $data['cols'] )?$data['cols']:40; ?>" class="small-text code" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) echo 'required'; ?>><?php echo $data['default']; ?></textarea>
-		<?php elseif ( $data['type'] == 'wysiwyg' ): ?>
+		<?php if ( $data['type'] == 'textarea' ) :  ?>
+			<textarea type="textarea" name="<?php echo $name; ?>" id="<?php echo $name; ?>" rows="<?php echo isset( $data['rows'] )?$data['rows']:4; ?>" cols="<?php echo isset( $data['cols'] )?$data['cols']:40; ?>" class="small-text code" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) { echo 'required'; } ?>><?php echo $data['default']; ?></textarea>
+		<?php elseif ( $data['type'] == 'wysiwyg' ) :  ?>
 			<?php
 				wp_editor( $data['default'], $name, array( 'textarea_rows' => 10 ) ); ?>
-		<?php elseif ( $data['type'] == 'select-state' ):  // FUTURE AJAX based on country selection  ?>
-			<select type="select" name="<?php echo $name; ?>" id="<?php echo $name; ?>" class="regular-text" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) echo 'required'; ?>>
+		<?php elseif ( $data['type'] == 'select-state' ) :   // FUTURE AJAX based on country selection  ?>
+			<select type="select" name="<?php echo $name; ?>" id="<?php echo $name; ?>" class="regular-text" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) { echo 'required'; } ?>>
 				<?php foreach ( $data['options'] as $group => $states ) : ?>
 					<optgroup label="<?php echo $group ?>">
-						<?php foreach ( $states as $option_key => $option_label ): ?>
+						<?php foreach ( $states as $option_key => $option_label ) :  ?>
 							<option value="<?php echo $option_key; ?>" <?php selected( $option_key, $data['default'] ) ?>><?php echo $option_label; ?></option>
 						<?php endforeach; ?>
 					</optgroup>
 				<?php endforeach; ?>
 			</select>
-		<?php elseif ( $data['type'] == 'select' ): ?>
-			<select type="select" name="<?php echo $name; ?>" id="<?php echo $name; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) echo 'required'; ?>>
-				<?php foreach ( $data['options'] as $option_key => $option_label ): ?>
+		<?php elseif ( $data['type'] == 'select' ) :  ?>
+			<select type="select" name="<?php echo $name; ?>" id="<?php echo $name; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) { echo 'required'; } ?>>
+				<?php foreach ( $data['options'] as $option_key => $option_label ) :  ?>
 				<option value="<?php echo $option_key; ?>" <?php selected( $option_key, $data['default'] ) ?>><?php echo $option_label; ?></option>
 				<?php endforeach; ?>
 			</select>
-		<?php elseif ( $data['type'] == 'multiselect' ): ?>
-			<select type="select" name="<?php echo $name; ?>[]" id="<?php echo $name; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> multiple="multiple" <?php if ( isset( $data['required'] ) && $data['required'] ) echo 'required'; ?>>
-				<?php foreach ( $data['options'] as $option_key => $option_label ): ?>
-					<option value="<?php echo $option_key; ?>" <?php if ( in_array( $option_key, $data['default'] ) ) echo 'selected="selected"' ?>><?php echo $option_label; ?></option>
+		<?php elseif ( $data['type'] == 'multiselect' ) :  ?>
+			<select type="select" name="<?php echo $name; ?>[]" id="<?php echo $name; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> multiple="multiple" <?php if ( isset( $data['required'] ) && $data['required'] ) { echo 'required'; } ?>>
+				<?php foreach ( $data['options'] as $option_key => $option_label ) :  ?>
+					<option value="<?php echo $option_key; ?>" <?php if ( in_array( $option_key, $data['default'] ) ) { echo 'selected="selected"'; } ?>><?php echo $option_label; ?></option>
 				<?php endforeach; ?>
 			</select>
-		<?php elseif ( $data['type'] == 'radios' ): ?>
-			<?php foreach ( $data['options'] as $option_key => $option_label ): ?>
+		<?php elseif ( $data['type'] == 'radios' ) :  ?>
+			<?php foreach ( $data['options'] as $option_key => $option_label ) :  ?>
 				<label for="<?php echo $name; ?>_<?php esc_attr_e( $option_key ); ?>"><input type="radio" name="<?php echo $name; ?>" id="<?php echo $name; ?>_<?php esc_attr_e( $option_key ); ?>" value="<?php esc_attr_e( $option_key ); ?>" <?php checked( $option_key, $data['default'] ) ?> />&nbsp;<?php _e( $option_label ); ?></label>
 				<br />
 			<?php endforeach; ?>
-		<?php elseif ( $data['type'] == 'checkbox' ): ?>
-			<input type="checkbox" name="<?php echo $name; ?>" id="<?php echo $name; ?>" <?php checked( $data['value'], $data['default'] ); ?> value="<?php echo isset( $data['value'] )?$data['value']:'On'; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) echo 'required'; ?>/>
-		<?php elseif ( $data['type'] == 'hidden' ): ?>
+		<?php elseif ( $data['type'] == 'checkbox' ) :  ?>
+			<input type="checkbox" name="<?php echo $name; ?>" id="<?php echo $name; ?>" <?php checked( $data['value'], $data['default'] ); ?> value="<?php echo isset( $data['value'] )?$data['value']:'On'; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) { echo 'required'; } ?>/>
+		<?php elseif ( $data['type'] == 'hidden' ) :  ?>
 			<input type="hidden" name="<?php echo $name; ?>" id="<?php echo $name; ?>" value="<?php echo $data['value']; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> />
-		<?php elseif ( $data['type'] == 'file' ): ?>
-			<input type="file" name="<?php echo $name; ?>" id="<?php echo $name; ?>" <?php if ( isset( $data['required'] ) && $data['required'] ) echo 'required'; ?>/>
-		<?php elseif ( $data['type'] == 'pages' ): ?>
-			<?php 
-				$defaults = array( 
-					'name' => $name, 
-					'echo' => 1, 
-					'show_option_none' => self::__( '-- Select --' ), 
-					'option_none_value' => '0', 
-					'selected' => $data['default'] 
+		<?php elseif ( $data['type'] == 'file' ) :  ?>
+			<input type="file" name="<?php echo $name; ?>" id="<?php echo $name; ?>" <?php if ( isset( $data['required'] ) && $data['required'] ) { echo 'required'; } ?>/>
+		<?php elseif ( $data['type'] == 'pages' ) :  ?>
+			<?php
+				$defaults = array(
+					'name' => $name,
+					'echo' => 1,
+					'show_option_none' => self::__( '-- Select --' ),
+					'option_none_value' => '0',
+					'selected' => $data['default'],
 					);
 				$parsed_args = wp_parse_args( $data['args'], $defaults );
 				wp_dropdown_pages( $parsed_args ); ?>
-		<?php elseif ( $data['type'] == 'bypass' ): ?>
-			<?php if ( isset( $data['output'] ) ) echo $data['output']; ?>
-		<?php else: ?>
-			<input type="<?php echo $data['type']; ?>" name="<?php echo $name; ?>" id="<?php echo $name; ?>" value="<?php echo $data['default']; ?>" placeholder="<?php echo isset( $data['placeholder'] )?$data['placeholder']:''; ?>" size="<?php echo isset( $data['size'] )?$data['size']:40; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) echo 'required'; ?> class="text-input" />
+		<?php elseif ( $data['type'] == 'bypass' ) :  ?>
+			<?php if ( isset( $data['output'] ) ) { echo $data['output']; } ?>
+		<?php else : ?>
+			<input type="<?php echo $data['type']; ?>" name="<?php echo $name; ?>" id="<?php echo $name; ?>" value="<?php echo $data['default']; ?>" placeholder="<?php echo isset( $data['placeholder'] )?$data['placeholder']:''; ?>" size="<?php echo isset( $data['size'] )?$data['size']:40; ?>" <?php foreach ( $data['attributes'] as $attr => $attr_value ) { echo $attr.'="'.$attr_value.'" '; } ?> <?php if ( isset( $data['required'] ) && $data['required'] ) { echo 'required'; } ?> class="text-input" />
 		<?php endif; ?>
 
-		<?php if ( $data['type'] != 'checkbox' && !empty( $data['description'] ) ): ?>
+		<?php if ( $data['type'] != 'checkbox' && ! empty( $data['description'] ) ) :  ?>
 			<p class="description help_block"><?php echo $data['description'] ?></p>
 		<?php endif; ?>
 		<?php
@@ -441,13 +438,13 @@ class SA_Settings_API extends EDD_Segment_Controller {
 
 	/**
 	 * Attempt to save the current page options
-	 * @return  
+	 * @return
 	 */
 	public function maybe_save_options_via_ajax() {
 		if ( is_admin() ) {
-			if ( !isset( $_POST['options'] ) )
-				return;
-			
+			if ( ! isset( $_POST['options'] ) ) {
+				return; }
+
 			// unserialize
 			wp_parse_str( $_POST['options'], $options );
 			// Confirm the form was an update
@@ -456,11 +453,11 @@ class SA_Settings_API extends EDD_Segment_Controller {
 
 				// capability check
 				$capability = apply_filters( "option_page_capability_{$option_page}", 'manage_options' );
-				if ( !current_user_can( $capability ) )
-					wp_die(__('Cheatin&#8217; uh?'));
+				if ( ! current_user_can( $capability ) ) {
+					wp_die( __( 'Cheatin&#8217; uh?' ) ); }
 
 				self::update_options( $options, $option_page );
-				echo apply_filters( 'save_options_via_ajax_message', self::__('Saved'), $option_page );
+				echo apply_filters( 'save_options_via_ajax_message', self::__( 'Saved' ), $option_page );
 				exit();
 			}
 		}
@@ -468,25 +465,25 @@ class SA_Settings_API extends EDD_Segment_Controller {
 
 	/**
 	 * Callback for saves options via AJAX method above.
-	 * @param  array  $submission  
-	 * @param  string $option_page 
-	 * @return               
+	 * @param  array  $submission
+	 * @param  string $option_page
+	 * @return
 	 */
 	public function update_options( $submission = array(), $option_page = '' ) {
 		global $wp_settings_fields;
 
-		if ( !isset( $wp_settings_fields[$option_page] ) )
-			return;
+		if ( ! isset( $wp_settings_fields[ $option_page ] ) ) {
+			return; }
 
-		if ( isset( $wp_settings_fields[$option_page] ) && !empty( $wp_settings_fields[$option_page] ) ) {
-			foreach ( $wp_settings_fields[$option_page] as $section ) {
+		if ( isset( $wp_settings_fields[ $option_page ] ) && ! empty( $wp_settings_fields[ $option_page ] ) ) {
+			foreach ( $wp_settings_fields[ $option_page ] as $section ) {
 				foreach ( $section as $option => $values ) {
 					$option = trim( $option );
 					$value = null;
 					if ( isset( $submission[ $option ] ) ) {
 						$value = $submission[ $option ];
-						if ( ! is_array( $value ) )
-							$value = trim( $value );
+						if ( ! is_array( $value ) ) {
+							$value = trim( $value ); }
 						$value = wp_unslash( $value );
 					}
 					update_option( $option, $value );
@@ -501,13 +498,13 @@ class SA_Settings_API extends EDD_Segment_Controller {
 
 	/**
 	 * Registered meta boxes for all post types, including the si_deal post type.
-	 * 	
+	 *
 	 * @param  array  $registered_boxes array of registered metaboxes
 	 * @param  string/array $type             post type(s)
 	 * @return null 		                  modifies class variable for all pt metaboxes
 	 */
 	public static function register_meta_box( $registered_boxes = array(), $post_types = array() ) {
-		if ( !is_array( $post_types ) ) {
+		if ( ! is_array( $post_types ) ) {
 			$post_types = array( $post_types ); // convert a string into an array.
 		}
 		foreach ( $post_types as $post_type ) {
@@ -519,22 +516,22 @@ class SA_Settings_API extends EDD_Segment_Controller {
 					'priority' => 'high',
 					'callback_args' => array(),
 					'weight' => 10,
-					'save_priority' => 10
+					'save_priority' => 10,
 				);
 
-			if ( !isset( self::$meta_boxes[$post_type] ) ) {
-				self::$meta_boxes[$post_type] = array();
+			if ( ! isset( self::$meta_boxes[ $post_type ] ) ) {
+				self::$meta_boxes[ $post_type ] = array();
 			}
 			foreach ( $registered_boxes as $box_name => $args ) {
-				$registered_boxes[$box_name] = wp_parse_args( $args, $defaults );
+				$registered_boxes[ $box_name ] = wp_parse_args( $args, $defaults );
 			}
-			self::$meta_boxes[$post_type] = wp_parse_args( self::$meta_boxes[$post_type], $registered_boxes );
+			self::$meta_boxes[ $post_type ] = wp_parse_args( self::$meta_boxes[ $post_type ], $registered_boxes );
 		}
 	}
 
 	/**
 	 * loop through registered meta boxes and use the add_meta_box WP function.
-	 * 
+	 *
 	 */
 	public static function add_meta_boxes() {
 		// Loop through all registered meta boxes
@@ -551,15 +548,15 @@ class SA_Settings_API extends EDD_Segment_Controller {
 
 	/**
 	 * Show the meta box using the registered callback.
-	 * 
-	 * @param  object $post     
-	 * @param  array $meta_box 
+	 *
+	 * @param  object $post
+	 * @param  array $meta_box
 	 */
 	public static function show_meta_box( $post, $meta_box ) {
 		if ( $is_callable = is_callable( $meta_box['args']['show_callback'] ) ) {
-			do_action(  implode( '::', $meta_box['args']['show_callback'] ), $post, $meta_box );
+			do_action( implode( '::', $meta_box['args']['show_callback'] ), $post, $meta_box );
 			call_user_func_array( $meta_box['args']['show_callback'], array( $post, $meta_box ) );
-			do_action(  implode( '::', $meta_box['args']['show_callback'] ), $post, $meta_box );
+			do_action( implode( '::', $meta_box['args']['show_callback'] ), $post, $meta_box );
 		} else {
 			if ( method_exists( $meta_box['args']['show_callback'][0], $meta_box['args']['show_callback'][1] ) ) {
 				do_action( 'si_error', __CLASS__ . '::' . __FUNCTION__ . ' - callback may be private.', $meta_box );
@@ -569,10 +566,10 @@ class SA_Settings_API extends EDD_Segment_Controller {
 
 	/**
 	 * Attempt to save all registered meta boxes.
-	 * 
+	 *
 	 * @param  int $post_id
 	 * @param  object $post
-	 * @return 
+	 * @return
 	 */
 	public static function save_meta_boxes( $post_id, $post ) {
 		// Don't save meta boxes when the importer is used.
@@ -597,11 +594,10 @@ class SA_Settings_API extends EDD_Segment_Controller {
 				foreach ( $post_meta_boxes as $box_name => $args ) {
 					if ( isset( $args['save_callback'] ) ) {
 						if ( is_callable( $args['save_callback'] ) ) {
-							$callback_args = ( !isset( $args['save_callback_args'] ) ) ? array() : $args['save_callback_args'] ;
+							$callback_args = ( ! isset( $args['save_callback_args'] ) ) ? array() : $args['save_callback_args'] ;
 							call_user_func_array( $args['save_callback'], array( $post_id, $post, $callback_args ) );
 							do_action( implode( '::', $args['save_callback'] ), $post_id, $post, $callback_args );
-						}
-						elseif ( method_exists( $args['save_callback'][0], $args['save_callback'][1] ) ) {
+						} elseif ( method_exists( $args['save_callback'][0], $args['save_callback'][1] ) ) {
 							do_action( 'si_error', __CLASS__ . '::' . __FUNCTION__ . ' - callback may be private.', $args );
 						}
 					}
@@ -614,13 +610,12 @@ class SA_Settings_API extends EDD_Segment_Controller {
 	 * Comparison function
 	 */
 	public static function sort_by_save_weight( $a, $b ) {
-		if ( !isset( $a['save_priority'] ) || !isset( $b['save_priority'] ) )
-			return 0;	
-		
+		if ( ! isset( $a['save_priority'] ) || ! isset( $b['save_priority'] ) ) {
+			return 0; }
+
 		if ( $a['save_priority'] == $b['save_priority'] ) {
 			return 0;
 		}
 		return ( $a['save_priority'] < $b['save_priority'] ) ? -1 : 1;
 	}
-
 }

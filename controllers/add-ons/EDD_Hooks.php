@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * EDD Segment API Controller
@@ -7,18 +7,19 @@
  * @subpackage EDD_Segment EDD Hooks
  */
 class EDD_Segment_Hooks extends EDD_Segment_Controller {
-	
+
 	public static function init() {
+
 		// completed purchase
 		add_action( 'edd_complete_purchase', array( __CLASS__, 'track_purchase' ), 100 );
 		add_action( 'edd_complete_purchase', array( __CLASS__, 'track_purchased_items' ), 100 );
 		// Payment status updated
-        add_action( 'edd_update_payment_status', array( __CLASS__, 'track_payment_changes' ), 10 , 3 );
-        // find old abandoned carts every half hour
-        add_action( self::CRON_HOOK, array( __CLASS__, 'find_old_abandoned_carts' ) );
+		add_action( 'edd_update_payment_status', array( __CLASS__, 'track_payment_changes' ), 10 , 3 );
+		// find old abandoned carts every half hour
+		add_action( self::CRON_HOOK, array( __CLASS__, 'find_old_abandoned_carts' ) );
 
-        // Renewal email sent
-        add_action( 'edd_sl_send_renewal_reminder', array( __CLASS__, 'edd_sl_renewal_reminder' ), PHP_INT_MAX, 3 );
+		// Renewal email sent
+		add_action( 'edd_sl_send_renewal_reminder', array( __CLASS__, 'edd_sl_renewal_reminder' ), PHP_INT_MAX, 3 );
 
 		// EDD JS Events
 		add_action( 'edd_cart_items_after', array( __CLASS__, 'add_edd_cart_js_events' ), 10, 2 );
@@ -27,8 +28,8 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 
 	/**
 	 * Create identity and track purchase
-	 * @param  int $payment_id 
-	 * @return null             
+	 * @param  int $payment_id
+	 * @return null
 	 */
 	public static function track_purchase( $payment_id ) {
 
@@ -53,8 +54,8 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 
 	/**
 	 * Track each item purchased
-	 * @param  int $payment_id 
-	 * @return null             
+	 * @param  int $payment_id
+	 * @return null
 	 */
 	public static function track_purchased_items( $payment_id ) {
 		$user_id = edd_get_payment_user_id( $payment_id );
@@ -70,10 +71,10 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 
 	/**
 	 * Track if a purchase was refunded
-	 * @param  int $payment_id 
-	 * @param  string $new_status 
-	 * @param  string $old_status 
-	 * @return              
+	 * @param  int $payment_id
+	 * @param  string $new_status
+	 * @param  string $old_status
+	 * @return
 	 */
 	public static function track_payment_changes( $payment_id, $new_status, $old_status ) {
 		if ( $new_status == 'refunded' ) {
@@ -110,14 +111,14 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 
 	/**
 	 * this is a filter so make sure to return what's being filtered. maybe later this can be an action
-	 * @param  boolean $send       
-	 * @param  string  $license_id 
-	 * @param  string  $notice_id  
+	 * @param  boolean $send
+	 * @param  string  $license_id
+	 * @param  string  $notice_id
 	 * @return $send
 	 */
 	public static function edd_sl_renewal_reminder( $send = true, $license_id = '', $notice_id = '' ) {
 		if ( ! $send ) {
-			// renewal not sent 
+			// renewal not sent
 			return $send;
 		}
 		$item_id = EDD_Software_Licensing::get_download_id( $license_id );
@@ -151,7 +152,7 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 		);
 
 		$pending_payments  = new EDD_Payments_Query( $args );
-		$payments =  $pending_payments->get_payments();
+		$payments = $pending_payments->get_payments();
 		foreach ( $payments as $payment ) {
 			$payment_id = $payment->ID;
 			$user_id = edd_get_payment_user_id( $payment_id );
@@ -198,5 +199,4 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 			}
 		}
 	}
-
 }

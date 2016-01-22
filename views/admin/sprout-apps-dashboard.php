@@ -4,18 +4,18 @@
 
 	<h1><?php printf( self::__( 'Welcome to <a href="%s">Sprout Apps</a>!' ), self::PLUGIN_URL ); ?></h1>
 
-	<div class="about-text"><?php self::_e('Our mission is to build a suite of apps to help small businesses and freelancers work more efficiently by reducing the tedious business tasks associated with client management...<em>seriously though</em>, I\'m trying to build something awesome that you will love. Thank you for your support.') ?></div>
+	<div class="about-text"><?php self::_e( 'Our mission is to build a suite of apps to help small businesses and freelancers work more efficiently by reducing the tedious business tasks associated with client management...<em>seriously though</em>, I\'m trying to build something awesome that you will love. Thank you for your support.' ) ?></div>
 
 	<div id="welcome-panel" class="welcome-panel clearfix">
 		<div class="welcome-panel-content">
-			<h2><?php self::_e('Sprout Apps News and Updates') ?></h2>
+			<h2><?php self::_e( 'Sprout Apps News and Updates' ) ?></h2>
 			<?php
 				$maxitems = 0;
 				include_once( ABSPATH . WPINC . '/feed.php' );
 				$rss = fetch_feed( self::PLUGIN_URL.'/feed/' ); // FUTURE use feedburner
-				if ( !is_wp_error( $rss ) ) :
-					$maxitems = $rss->get_item_quantity( 3 );
-					$rss_items = $rss->get_items( 0, $maxitems );
+			if ( ! is_wp_error( $rss ) ) :
+				$maxitems = $rss->get_item_quantity( 3 );
+				$rss_items = $rss->get_items( 0, $maxitems );
 				endif;
 			?>
 			<div class="rss_widget clearfix">
@@ -27,7 +27,7 @@
 						?>
 						<div>
 							<h4><a href="<?php echo esc_url( $item->get_permalink() ); ?>" title="<?php echo esc_html( $item->get_title() ); ?>"><?php echo esc_html( $item->get_title() ); ?></a></h4>
-							<span class="rss_date"><?php echo $item->get_date('j F Y'); ?></span>
+							<span class="rss_date"><?php echo $item->get_date( 'j F Y' ); ?></span>
 							<p><?php echo $excerpt; ?></p>
 						</div>
 					<?php endforeach; ?>

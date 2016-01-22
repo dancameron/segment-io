@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * EDD Customer.io API Controller
@@ -55,7 +55,7 @@ class EDD_CustomerIO_Tracker extends EDD_Segment_Controller {
 			})();
 		</script>
 		
-		<?php if ( is_user_logged_in() ): // show for logged in users only. Other visitors can be identified via other methods.
+		<?php if ( is_user_logged_in() ) :  // show for logged in users only. Other visitors can be identified via other methods.
 			$uid = EDD_Segment_Identity::get_uid_from_user_id( get_current_user_id() );
 			$user = get_user_by( 'id', get_current_user_id() );
 			$first_name = $user->first_name;
@@ -89,8 +89,7 @@ class EDD_CustomerIO_Tracker extends EDD_Segment_Controller {
 	public static function js_track( $event = '', $props = array() ) {
 		if ( ! empty( $props ) ) {
 			echo '<script type="text/javascript">_cio.track("'.$event.'", '.json_encode( $props ).');</script>';
-		}
-		else {
+		} else {
 			echo '<script type="text/javascript">_cio.track("'.$event.'");</script>';
 		}
 	}
@@ -104,27 +103,26 @@ class EDD_CustomerIO_Tracker extends EDD_Segment_Controller {
 	 * used with action edd_segment_identify
 	 */
 	public static function identify( $user_id = 0, $traits = array() ) {
-		if ( !$user_id && is_user_logged_in() ) {
+		if ( ! $user_id && is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 		}
-		
+
 		// A user is necessary
-		if ( !$user_id ) {
+		if ( ! $user_id ) {
 			return;
 		}
 
 		// the email from traits should be used by default
-		$email = ( isset( $traits['email'] ) && is_email( $traits['email'] ) ) ? $traits['email'] : FALSE ;
+		$email = ( isset( $traits['email'] ) && is_email( $traits['email'] ) ) ? $traits['email'] : false ;
 
 		// Attempt to get email from user_id
-		if ( !$email ) {
+		if ( ! $email ) {
 			$user = get_userdata( $user_id );
 			// fill in any traits not passed to the method
 			if ( is_a( $user, 'WP_User' ) ) {
 				$email = $user->user_email;
-			}
-			else {
-				return FALSE;
+			} else {
+				return false;
 			}
 		}
 
@@ -133,9 +131,9 @@ class EDD_CustomerIO_Tracker extends EDD_Segment_Controller {
 			'time' => time(),
 			'created_at' => time(),
 		);
-		
-		self::remote_put( $user_id, $data, FALSE );
-		
+
+		self::remote_put( $user_id, $data, false );
+
 	}
 
 	/**
@@ -143,22 +141,21 @@ class EDD_CustomerIO_Tracker extends EDD_Segment_Controller {
 	 * used with action edd_segment_track
 	 */
 	public static function track( $user_id = 0, $event = '', $props = array() ) {
-		if ( !$user_id && is_user_logged_in() ) {
+		if ( ! $user_id && is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 		}
 
 		// A user is necessary
-		if ( !$user_id ) {
+		if ( ! $user_id ) {
 			return;
 		}
 
 		$data = array(
 			'name' => $event,
 			'data' => $props,
-			'time' => time()
+			'time' => time(),
 		);
 		self::remote_put( $user_id, $data );
-		
 
 	}
 
@@ -180,7 +177,7 @@ class EDD_CustomerIO_Tracker extends EDD_Segment_Controller {
 	 * @param  integer $user_id  User ID that customer.io should know about.
 	 * @param  array   $data     data array relevant to event
 	 * @param  boolean $is_event If set to false than this is a new customer reg.
-	 * @return             
+	 * @return
 	 */
 	public static function remote_put( $user_id = 0, $data = array(), $is_event = true ) {
 		// Get relevant endpoint
@@ -194,8 +191,8 @@ class EDD_CustomerIO_Tracker extends EDD_Segment_Controller {
 			'body' => $data,
 			'headers' => array(
 				'Authorization' => 'Basic ' . base64_encode( self::$site_id . ':' . self::$api_key ),
-				)
-			) );
+				),
+		) );
 		if ( is_wp_error( $request ) || 200 !== (int) wp_remote_retrieve_response_code( $request ) ) {
 			$method = ( $is_event ) ? 'POST' : 'PUT';
 			$session = curl_init();
@@ -217,5 +214,4 @@ class EDD_CustomerIO_Tracker extends EDD_Segment_Controller {
 		$response = wp_remote_retrieve_body( $request );
 		return $response;
 	}
-
 }

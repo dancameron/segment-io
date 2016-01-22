@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * AJAX Callbacks Controller
@@ -7,7 +7,7 @@
  * @subpackage EDD_Segment AJAX
  */
 class EDD_Segment_AJAX_Callbacks extends EDD_Segment_Controller {
-	
+
 	public static function init() {
 
 		// AJAX action to send is - sgmnt_reg or sgmnt_demo
@@ -17,27 +17,27 @@ class EDD_Segment_AJAX_Callbacks extends EDD_Segment_Controller {
 		add_action( 'wp_ajax_nopriv_sgmnt_demo',  array( __CLASS__, 'maybe_a_registration' ), 10, 0 );
 
 		// AJAX action to send is - sgmnt_free_license
-		// This returns a license key that can be filtered, since I don't know what license you want to return :) 
+		// This returns a license key that can be filtered, since I don't know what license you want to return :)
 		add_action( 'wp_ajax_sgmnt_free_license',  array( __CLASS__, 'maybe_free_license_registration' ), 10, 0 );
 		add_action( 'wp_ajax_nopriv_sgmnt_free_license',  array( __CLASS__, 'maybe_free_license_registration' ), 10, 0 );
 	}
-	
+
 	/**
-	 * Used from an external API call to wp admin ajax to register a user 
+	 * Used from an external API call to wp admin ajax to register a user
 	 * and create a new segment identity.
-	 * 
+	 *
 	 */
 	public static function maybe_a_registration() {
-		if ( !isset( $_REQUEST['uid'] ) ) {
+		if ( ! isset( $_REQUEST['uid'] ) ) {
 			self::ajax_fail( 'No uid submitted' );
 		}
 		$email = $_REQUEST['uid'];
-		if ( !is_email( $email ) ) {
+		if ( ! is_email( $email ) ) {
 			self::ajax_fail( 'uid not valid' );
 		}
 
 		$user_id = EDD_Segment_Identity::get_uid( $email );
-		
+
 		// Send identity
 		$traits = array(
 				'name' => ( isset( $_REQUEST['name'] ) ) ? $_REQUEST['name'] : '',
@@ -61,23 +61,23 @@ class EDD_Segment_AJAX_Callbacks extends EDD_Segment_Controller {
 		echo json_encode( $response );
 		exit();
 	}
-	
+
 	/**
-	 * Used from an external API call to wp admin ajax to register a user 
+	 * Used from an external API call to wp admin ajax to register a user
 	 * and create a new segment identity.
-	 * 
+	 *
 	 */
 	public static function maybe_free_license_registration() {
-		if ( !isset( $_REQUEST['uid'] ) ) {
+		if ( ! isset( $_REQUEST['uid'] ) ) {
 			self::ajax_fail( 'No uid submitted' );
 		}
 		$email = $_REQUEST['uid'];
-		if ( !is_email( $email ) ) {
+		if ( ! is_email( $email ) ) {
 			self::ajax_fail( 'uid not valid' );
 		}
 
 		$user_id = EDD_Segment_Identity::get_uid( $email );
-		
+
 		// Send identity
 		$traits = array(
 				'name' => ( isset( $_REQUEST['name'] ) ) ? $_REQUEST['name'] : '',
@@ -95,11 +95,11 @@ class EDD_Segment_AJAX_Callbacks extends EDD_Segment_Controller {
 			);
 		do_action( 'edd_segment_track', $user_id, 'Free Product Registration', $props );
 
-		// The response sends the user's license key, 
+		// The response sends the user's license key,
 		// which at this moment is just a random string
 		// that isn't yet tied to the user.
 		$response = array(
-				'license_key' => wp_generate_password( 40, FALSE ),
+				'license_key' => wp_generate_password( 40, false ),
 				'uid' => $user_id,
 			);
 		header( 'Content-type: application/json' );

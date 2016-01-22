@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 
 /**
  * EDD Segment API Controller
  *
  * @todo This should all be abstracted into their own integrations.
- *  
+ *
  * @package EDD_Segment
  * @subpackage HSD Admin Settings
  */
@@ -22,7 +22,7 @@ class EDD_Segment_Settings extends EDD_Segment_Controller {
 		self::$write_key = get_option( self::SEGMENT_WRITE_KEY, '' );
 		self::$customerio_api = get_option( self::CUSTOMERIO_API_KEY, '' );
 		self::$customerio_site_id = get_option( self::CUSTOMERIO_SITE_ID, '' );
-		
+
 		// Register Settings
 		self::register_settings();
 
@@ -57,8 +57,8 @@ class EDD_Segment_Settings extends EDD_Segment_Controller {
 			'menu_title' => 'EDD Segment',
 			'tab_title' => 'Getting Started',
 			'weight' => 20,
-			'reset' => FALSE, 
-			'section' => self::SETTINGS_PAGE
+			'reset' => false,
+			'section' => self::SETTINGS_PAGE,
 			);
 		do_action( 'sprout_settings_page', $args );
 
@@ -72,29 +72,29 @@ class EDD_Segment_Settings extends EDD_Segment_Controller {
 					self::SEGMENT_WRITE_KEY => array(
 						'label' => self::__( 'Segment Write Key' ),
 						'option' => array(
-							'description' => self::__('Found under "Project Settings" within the "API KEYS" tab.'),
+							'description' => self::__( 'Found under "Project Settings" within the "API KEYS" tab.' ),
 							'type' => 'text',
-							'default' => self::$write_key
-							)
+							'default' => self::$write_key,
+							),
 						),
 					self::CUSTOMERIO_SITE_ID => array(
 						'label' => self::__( 'Customer.io Site ID' ),
 						'option' => array(
-							'description' => self::__('Found under "Integration".'),
+							'description' => self::__( 'Found under "Integration".' ),
 							'type' => 'text',
-							'default' => self::$customerio_site_id
-							)
+							'default' => self::$customerio_site_id,
+							),
 						),
 					self::CUSTOMERIO_API_KEY => array(
 						'label' => self::__( 'Customer.io API Key' ),
 						'option' => array(
-							'description' => self::__('Found under "Integration". Event information will be sent directly to customer.io.'),
+							'description' => self::__( 'Found under "Integration". Event information will be sent directly to customer.io.' ),
 							'type' => 'text',
-							'default' => self::$customerio_api
-							)
-						)
-				)
-			)
+							'default' => self::$customerio_api,
+							),
+						),
+				),
+			),
 		);
 		do_action( 'sprout_settings', $settings, self::SETTINGS_PAGE );
 	}
@@ -106,5 +106,4 @@ class EDD_Segment_Settings extends EDD_Segment_Controller {
 	public static function display_general_section() {
 		echo '<p>'.self::_e( 'EDD Segment supports two integrations at the moment, Segment and customer.io. Segment can be integrated with customer.io, so you may want to just use that integration but you have the choice to use both or either/or.' ).'</p>';
 	}
-
 }

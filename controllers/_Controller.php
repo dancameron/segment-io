@@ -28,11 +28,10 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'register_resources' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'frontend_enqueue' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue' ), 20 );
-		
+
 		// Cron
 		add_filter( 'cron_schedules', array( __CLASS__, 'edd_segment_cron_schedule' ) );
 		add_action( 'init', array( __CLASS__, 'set_schedule' ), 10, 0 );
-
 
 		// Add the role.
 		add_action( 'edd_segment_plugin_activation_hook',  array( __CLASS__, 'segmented_role' ), 10, 0 );
@@ -41,10 +40,10 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 
 	/**
 	 * Fire actions based on plugin being updated.
-	 * @return 
+	 * @return
 	 */
 	public static function edd_segments_activated() {
-		add_option( 'edd_segment_do_activation_redirect', TRUE );
+		add_option( 'edd_segment_do_activation_redirect', true );
 		// Get the previous version number
 		$edd_segment_version = get_option( 'edd_segment_current_version', self::EDD_Segment_VERSION );
 		if ( version_compare( $edd_segment_version, self::EDD_Segment_VERSION, '<' ) ) { // If an upgrade create some hooks
@@ -60,11 +59,11 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 	public static function register_resources() {
 		// Templates
 		wp_register_script( 'edd_segment', EDD_SEGMENT_URL . '/resources/front-end/js/edd-segment.js', array( 'jquery', 'redactor' ), self::EDD_Segment_VERSION );
-		wp_register_style( 'edd_segment', EDD_SEGMENT_URL . '/resources/front-end/css/edd-segment.style.css', array( 'redactor' ), self::EDD_Segment_VERSION  );
+		wp_register_style( 'edd_segment', EDD_SEGMENT_URL . '/resources/front-end/css/edd-segment.style.css', array( 'redactor' ), self::EDD_Segment_VERSION );
 
 		// Admin
 		wp_register_script( 'edd_segment_admin_js', EDD_SEGMENT_URL . '/resources/admin/js/edd-segment.js', array( 'jquery' ), self::EDD_Segment_VERSION );
-		wp_register_style( 'edd_segment_admin_css', EDD_SEGMENT_URL . '/resources/admin/css/edd-segment.css', array(), self::EDD_Segment_VERSION  );
+		wp_register_style( 'edd_segment_admin_css', EDD_SEGMENT_URL . '/resources/admin/css/edd-segment.css', array(), self::EDD_Segment_VERSION );
 
 	}
 
@@ -72,7 +71,7 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 		$edd_segment_js_object = array(
 			'admin_ajax' => admin_url( 'admin-ajax.php' ),
 			'sec' => wp_create_nonce( self::NONCE ),
-			'post_id' => get_the_ID()
+			'post_id' => get_the_ID(),
 		);
 		wp_localize_script( 'edd_segment', 'edd_segment_js_object', apply_filters( 'edd_segment_scripts_localization', $edd_segment_js_object ) );
 
@@ -82,28 +81,28 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 		wp_enqueue_script( 'edd_segment_admin_js' );
 		wp_enqueue_style( 'edd_segment_admin_css' );
 		$edd_segment_js_object = array(
-			'sec' => wp_create_nonce( self::NONCE )
+			'sec' => wp_create_nonce( self::NONCE ),
 		);
 		wp_localize_script( 'edd_segment_admin_js', 'edd_segment_js_object', apply_filters( 'edd_segment_scripts_localization', $edd_segment_js_object ) );
 	}
 
 	/**
 	 * Filter WP Cron schedules
-	 * @param  array $schedules 
-	 * @return array            
+	 * @param  array $schedules
+	 * @return array
 	 */
 	public static function edd_segment_cron_schedule( $schedules ) {
 		$schedules['minute'] = array(
 			'interval' => 60,
-			'display' => __( 'Once a Minute' )
+			'display' => __( 'Once a Minute' ),
 		);
 		$schedules['quarterhour'] = array(
 			'interval' => 900,
-			'display' => __( '15 Minutes' )
+			'display' => __( '15 Minutes' ),
 		);
 		$schedules['halfhour'] = array(
 			'interval' => 1800,
-			'display' => __( 'Twice Hourly' )
+			'display' => __( 'Twice Hourly' ),
 		);
 		return $schedules;
 	}
@@ -115,11 +114,11 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 		if ( self::DEBUG ) {
 			wp_clear_scheduled_hook( self::CRON_HOOK );
 		}
-		if ( !wp_next_scheduled( self::CRON_HOOK ) ) {
+		if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
 			$interval = apply_filters( 'edd_segment_set_schedule', 'halfhour' );
 			wp_schedule_event( time(), $interval, self::CRON_HOOK );
 		}
-		if ( !wp_next_scheduled( self::DAILY_CRON_HOOK ) ) {
+		if ( ! wp_next_scheduled( self::DAILY_CRON_HOOK ) ) {
 			wp_schedule_event( time(), 'daily', self::DAILY_CRON_HOOK );
 		}
 	}
@@ -133,7 +132,7 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 	 * @param bool    $allow_theme_override
 	 * @return void
 	 */
-	public static function load_view( $view, $args, $allow_theme_override = TRUE ) {
+	public static function load_view( $view, $args, $allow_theme_override = true ) {
 		// whether or not .php was added
 		if ( substr( $view, -4 ) != '.php' ) {
 			$view .= '.php';
@@ -144,12 +143,11 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 		}
 		$file = apply_filters( 'edd_segment_template_'.$view, $file );
 		$args = apply_filters( 'load_view_args_'.$view, $args, $allow_theme_override );
-		if ( !empty( $args ) ) extract( $args );
+		if ( ! empty( $args ) ) { extract( $args ); }
 		if ( self::DEBUG ) {
 			include $file;
-		}
-		else {
-			include $file;	
+		} else {
+			include $file;
 		}
 	}
 
@@ -162,7 +160,7 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 	 * @param bool    $allow_theme_override
 	 * @return string
 	 */
-	protected static function load_view_to_string( $view, $args, $allow_theme_override = TRUE ) {
+	protected static function load_view_to_string( $view, $args, $allow_theme_override = true ) {
 		ob_start();
 		self::load_view( $view, $args, $allow_theme_override );
 		return ob_get_clean();
@@ -184,7 +182,7 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 		foreach ( $possibilities as $p ) {
 			$theme_overrides[] = self::get_template_path().'/'.$p;
 		}
-		if ( $found = locate_template( $theme_overrides, FALSE ) ) {
+		if ( $found = locate_template( $theme_overrides, false ) ) {
 			return $found;
 		}
 
@@ -201,7 +199,7 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 
 
 	public static function segmented_role() {
-		add_role( self::NEW_USER_ROLE, self::__('Segmented'), array( 'read' => true, 'level_0' => true ) );
+		add_role( self::NEW_USER_ROLE, self::__( 'Segmented' ), array( 'read' => true, 'level_0' => true ) );
 	}
 
 	public static function new_user_role() {
@@ -214,7 +212,7 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 
 	/**
 	 * Template path for templates/views, default to 'invoices'.
-	 * 
+	 *
 	 * @return string self::$template_path the folder
 	 */
 	public static function get_template_path() {
@@ -222,8 +220,8 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 	}
 
 	public static function login_required( $redirect = '' ) {
-		if ( !get_current_user_id() && apply_filters( 'edd_segment_login_required', TRUE ) ) {
-			if ( !$redirect && self::using_permalinks() ) {
+		if ( ! get_current_user_id() && apply_filters( 'edd_segment_login_required', true ) ) {
+			if ( ! $redirect && self::using_permalinks() ) {
 				$schema = is_ssl() ? 'https://' : 'http://';
 				$redirect = $schema.$_SERVER['SERVER_NAME'].htmlspecialchars( $_SERVER['REQUEST_URI'] );
 				if ( isset( $_REQUEST ) ) {
@@ -233,7 +231,7 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 			wp_redirect( wp_login_url( $redirect ) );
 			exit();
 		}
-		return TRUE; // explicit return value, for the benefit of the router plugin
+		return true; // explicit return value, for the benefit of the router plugin
 	}
 
 	/**
@@ -248,8 +246,8 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 	 * Tell caching plugins not to cache the current page load
 	 */
 	public static function do_not_cache() {
-		if ( !defined('DONOTCACHEPAGE') ) {
-			define('DONOTCACHEPAGE', TRUE);
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
 		}
 		nocache_headers();
 	}
@@ -264,7 +262,7 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 		if ( function_exists( 'wp_cache_post_change' ) ) {
 			// WP Super Cache
 
-			$GLOBALS["super_cache_enabled"] = 1;
+			$GLOBALS['super_cache_enabled'] = 1;
 			wp_cache_post_change( $post_id );
 
 		} elseif ( function_exists( 'w3tc_pgcache_flush_post' ) ) {
@@ -275,16 +273,15 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 		}
 	}
 
-	public static function ajax_fail( $message = '', $json = TRUE ) {
+	public static function ajax_fail( $message = '', $json = true ) {
 		if ( $message == '' ) {
-			$message = self::__('Something failed.');
+			$message = self::__( 'Something failed.' );
 		}
-		if ( $json ) header( 'Content-type: application/json' );
-		if ( self::DEBUG ) header( 'Access-Control-Allow-Origin: *' );
+		if ( $json ) { header( 'Content-type: application/json' ); }
+		if ( self::DEBUG ) { header( 'Access-Control-Allow-Origin: *' ); }
 		if ( $json ) {
 			echo json_encode( array( 'error' => 1, 'response' => $message ) );
-		}
-		else {
+		} else {
 			echo $message;
 		}
 		exit();
@@ -294,13 +291,12 @@ abstract class EDD_Segment_Controller extends EDD_Segment {
 	 * Comparison function
 	 */
 	public static function sort_by_weight( $a, $b ) {
-		if ( !isset( $a['weight'] ) || !isset( $b['weight'] ) )
-			return 0;	
-		
+		if ( ! isset( $a['weight'] ) || ! isset( $b['weight'] ) ) {
+			return 0; }
+
 		if ( $a['weight'] == $b['weight'] ) {
 			return 0;
 		}
 		return ( $a['weight'] < $b['weight'] ) ? -1 : 1;
 	}
-
 }
