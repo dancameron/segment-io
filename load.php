@@ -48,6 +48,11 @@ function edd_segment_load() {
 		EDD_Segment_AJAX_Callbacks::init();
 	}
 
+	if ( file_exists( EDD_SEGMENT_PATH.'/controllers/add-ons/Freemius_Webhook.php' ) ) {
+		require_once EDD_SEGMENT_PATH.'/controllers/add-ons/Freemius_Webhook.php';
+		EDD_Segment_Freemius_Webhook::init();
+	}
+
 	require_once EDD_SEGMENT_PATH.'/controllers/add-ons/EDD_Hooks.php';
 	EDD_Segment_Hooks::init();
 
