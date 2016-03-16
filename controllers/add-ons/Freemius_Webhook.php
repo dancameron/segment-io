@@ -27,7 +27,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 		$event_json = json_decode( $input );
 
 		if ( ! isset( $event_json->id ) ) {
-			http_response_code( 200 );
+			self::ajax_fail( 'Hey man! This be no webhook.' );
 			exit();
 		}
 
@@ -43,7 +43,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 
 		$props = array(
 			'email' => $fs_event->user->email,
-			'name' => $fs_event->user->first . ' ' $fs_event->user->last,
+			'name' => $fs_event->user->first . ' ' . $fs_event->user->last,
 			);
 
 		switch ( $fs_event->type ) {
