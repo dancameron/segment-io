@@ -33,17 +33,16 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 
 		require_once EDD_SEGMENT_PATH.'/controllers/add-ons/freemius-sdk/Freemius.php';
 		$fs = new Freemius_Api(
-			'sprout-invoices',
+			'plugin',
 			'234',
 			'pk_22ac32f2f35fd0e09e656f4671a0e',
 			EDD_SEG_IO_FREEMIUS_PRIVATE_KEY
 		);
-
 		$fs_event = $fs->Api( "/events/{$event_json->id}.json" );
 
 		$props = array(
-			'email' => $fs_event->user->email,
-			'name' => $fs_event->user->first . ' ' . $fs_event->user->last,
+			'email' => $fs_event->objects->user->email,
+			'name' => $fs_event->objects->user->first . ' ' . $fs_event->objects->user->last,
 			);
 
 		switch ( $fs_event->type ) {
@@ -123,7 +122,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 		$event_props = array(
 				'name' => 'sprout-invoices',
 				'time' => time(),
-				'email' => $email,
+				'email' => $props['email'],
 			);
 		do_action( 'edd_segment_track', $user_id, 'Free Install', $event_props );
 	}
@@ -135,7 +134,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 		// Send identity
 		$traits = array(
 				'name' => ( isset( $props['name'] ) ) ? $props['name'] : '',
-				'email' => $email,
+				'email' => $props['email'],
 				);
 		do_action( 'edd_segment_identify', $user_id, $traits );
 
@@ -143,10 +142,10 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 		$event_props = array(
 				'name' => 'sprout-invoices',
 				'time' => time(),
-				'email' => $email,
+				'email' => $props['email'],
 				'uninstall_code' => $props['uninstall_code'],
 				'uninstall_reason' => $props['uninstall_reason'],
 			);
-		do_action( 'edd_segment_track', $user_id, 'Free Install', $event_props );
+		do_action( 'edd_segment_track', $user_id, 'Free Uninstall', $event_props );
 	}
 }
