@@ -34,8 +34,8 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 		require_once EDD_SEGMENT_PATH.'/controllers/add-ons/freemius-sdk/Freemius.php';
 		$fs = new Freemius_Api(
 			'plugin',
-			'234',
-			'pk_22ac32f2f35fd0e09e656f4671a0e',
+			EDD_SEG_IO_FREEMIUS_PLUGIN_ID,
+			EDD_SEG_IO_FREEMIUS_PUBLIC_KEY,
 			EDD_SEG_IO_FREEMIUS_PRIVATE_KEY
 		);
 		$fs_event = $fs->Api( "/events/{$event_json->id}.json" );
@@ -43,6 +43,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 		$props = array(
 			'email' => $fs_event->objects->user->email,
 			'name' => $fs_event->objects->user->first . ' ' . $fs_event->objects->user->last,
+			'site_url' => $fs_event->objects->install->url,
 			);
 
 		switch ( $fs_event->type ) {
@@ -52,53 +53,11 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 
 				break;
 			case 'install.uninstalled':
-				/*/
-				define( 'FS__UNINSTALL_REASON_NO_LONGER_NEEDED', 1 );
-				define( 'FS__UNINSTALL_REASON_FOUND_BETTER_PLUGIN', 2 );
-				define( 'FS__UNINSTALL_REASON_USED_FOR_SHORT_PERIOD', 3 );
-				define( 'FS__UNINSTALL_REASON_BROKE_WEBSITE', 4 );
-				define( 'FS__UNINSTALL_REASON_STOPPED_WORKING', 5 );
-				define( 'FS__UNINSTALL_REASON_CANT_CONTINUE_PAYING', 6 );
-				define( 'FS__UNINSTALL_REASON_OTHER', 7 );
-				define( 'FS__UNINSTALL_REASON_DID_NOT_WORK_ANONYMOUS', 8 );
-				define( 'FS__UNINSTALL_REASON_DONT_LIKE_INFO_SHARE', 9 );
-				define( 'FS__UNINSTALL_REASON_UNCLEAR_HOW_WORKS', 10 );
-				define( 'FS__UNINSTALL_REASON_MISSING_FEATURE', 11 );
-				define( 'FS__UNINSTALL_REASON_DID_NOT_WORK', 12 );
-				define( 'FS__UNINSTALL_REASON_EXPECTED_SOMETHING_ELSE', 13 );
-				define( 'FS__UNINSTALL_REASON_EXPECTED_TO_WORK_DIFFERENTLY', 14 );
-				/**/
 
-				$fs_uninstall = $fs->Api( "/installs/{$event_json->install->id}/uninstall.json" );
-
+				$fs_uninstall = $fs->Api( "/installs/{$fs_event->install_id}/uninstall.json" );
 				$props['uninstall_code'] = $fs_uninstall->reason_id;
-				switch ( $fs_uninstall->reason_id ) {
-					case 1:
-						$props['uninstall_reason'] = 'No longer needed';
-						break;
-					case 2:
-						$props['uninstall_reason'] = 'Found alternative';
-						break;
-					case 3:
-						$props['uninstall_reason'] = 'Used for short period';
-						break;
-					case 4:
-						$props['uninstall_reason'] = 'Broke website';
-						break;
-					case 5:
-						$props['uninstall_reason'] = 'Stopped working';
-						break;
-					case 10:
-						$props['uninstall_reason'] = 'Unclear how it works';
-						break;
-					case 7:
-					case 9:
-						$props['uninstall_reason'] = 'Other';
-						break;
-					default:
-						$props['uninstall_reason'] = 'Unknown';
-						break;
-				}
+				$props['uninstall_reason'] = $fs_uninstall->reason;
+				$props['uninstall_reason_info'] = $fs_uninstall->reason_info;
 
 				self::new_uninstall( $props );
 
@@ -106,6 +65,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 		}
 
 		http_response_code( 200 );
+		exit();
 	}
 
 	public static function new_install( $props = array() ) {
@@ -114,7 +74,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 		// Send identity
 		$traits = array(
 				'name' => ( isset( $props['name'] ) ) ? $props['name'] : '',
-				'email' => $email,
+				'email' => $props['email'],
 				);
 		do_action( 'edd_segment_identify', $user_id, $traits );
 
@@ -123,6 +83,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 				'name' => 'sprout-invoices',
 				'time' => time(),
 				'email' => $props['email'],
+				'site_url' => $props['site_url'],
 			);
 		do_action( 'edd_segment_track', $user_id, 'Free Install', $event_props );
 	}
@@ -145,6 +106,7 @@ class EDD_Segment_Freemius_Webhook extends EDD_Segment_Controller {
 				'email' => $props['email'],
 				'uninstall_code' => $props['uninstall_code'],
 				'uninstall_reason' => $props['uninstall_reason'],
+				'site_url' => $props['site_url'],
 			);
 		do_action( 'edd_segment_track', $user_id, 'Free Uninstall', $event_props );
 	}
