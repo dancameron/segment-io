@@ -77,35 +77,34 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 	 * @return
 	 */
 	public static function track_payment_changes( $payment_id, $new_status, $old_status ) {
-		if ( $new_status == 'refunded' ) {
-			$user_id = edd_get_payment_user_id( $payment_id );
-			$uid = EDD_Segment_Identity::get_uid_from_user_id( $user_id );
-			$meta = edd_get_payment_meta( $payment_id );
 
-			// Adding an event for each item
-			foreach ( $meta['cart_details'] as $key => $item_details ) {
-				do_action( 'edd_segment_track', $uid, 'Refunded Payment', $item_details );
-			}
+		$user_id = edd_get_payment_user_id( $payment_id );
+		$uid = EDD_Segment_Identity::get_uid_from_user_id( $user_id );
+		$meta = edd_get_payment_meta( $payment_id );
+
+		switch ( $new_status ) {
+			case 'refunded':
+				$action_desc = 'Refunded Payment';
+				break;
+			case 'abandoned':
+				$action_desc = 'Abandoned Payment';
+				break;
+			case 'cancelled':
+				$action_desc = 'Cancelled Payment';
+				break;
+			case 'pending':
+				$action_desc = 'Pending Payment';
+				break;
+
+			default:
+				$action_desc = $new_status . ' Payment';
+				break;
 		}
-		if ( $new_status == 'abandoned' ) {
-			$user_id = edd_get_payment_user_id( $payment_id );
-			$uid = EDD_Segment_Identity::get_uid_from_user_id( $user_id );
-			$meta = edd_get_payment_meta( $payment_id );
-			// Adding an event for each item
-			foreach ( $meta['cart_details'] as $key => $item_details ) {
-				$item_details = array_merge( $item_details, array( 'time' => time() ) );
-				do_action( 'edd_segment_track', $uid, 'Abandoned Payment', $item_details );
-			}
-		}
-		if ( $new_status == 'cancelled' ) {
-			$user_id = edd_get_payment_user_id( $payment_id );
-			$uid = EDD_Segment_Identity::get_uid_from_user_id( $user_id );
-			$meta = edd_get_payment_meta( $payment_id );
-			// Adding an event for each item
-			foreach ( $meta['cart_details'] as $key => $item_details ) {
-				$item_details = array_merge( $item_details, array( 'time' => time() ) );
-				do_action( 'edd_segment_track', $uid, 'Cancelled Payment', $item_details );
-			}
+
+		// Adding an event for each item
+		foreach ( $meta['cart_details'] as $key => $item_details ) {
+			$item_details = array_merge( $item_details, array( 'time' => time() ) );
+			do_action( 'edd_segment_track', $uid, $action_desc, $item_details );
 		}
 	}
 
