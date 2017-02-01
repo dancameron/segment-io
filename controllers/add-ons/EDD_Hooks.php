@@ -18,6 +18,14 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 		// find old abandoned carts every half hour
 		add_action( self::CRON_HOOK, array( __CLASS__, 'find_old_abandoned_carts' ) );
 
+		// Subscription updated.
+		add_action( 'edd_subscription_completed', array( __CLASS__, 'track_subscription_changes' ), 10, 2 );
+		add_action( 'edd_subscription_expired', array( __CLASS__, 'track_subscription_changes' ), 10, 2 );
+		add_action( 'edd_subscription_failing', array( __CLASS__, 'track_subscription_changes' ), 10, 2 );
+		add_action( 'edd_subscription_cancelled', array( __CLASS__, 'track_subscription_changes' ), 10, 2 );
+
+		add_action( 'edd_recurring_payment_failed', array( __CLASS__, 'track_subscription_payment_failed' ), 10, 1 );
+
 		// Renewal email sent
 		add_action( 'edd_sl_send_renewal_reminder', array( __CLASS__, 'edd_sl_renewal_reminder' ), PHP_INT_MAX, 3 );
 
@@ -77,10 +85,13 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 	 * @return
 	 */
 	public static function track_payment_changes( $payment_id, $new_status, $old_status ) {
-
 		$user_id = edd_get_payment_user_id( $payment_id );
 		$uid = EDD_Segment_Identity::get_uid_from_user_id( $user_id );
 		$meta = edd_get_payment_meta( $payment_id );
+
+		if ( ! is_array( $meta['cart_details'] ) ) {
+			return;
+		}
 
 		switch ( $new_status ) {
 			case 'refunded':
@@ -107,6 +118,83 @@ class EDD_Segment_Hooks extends EDD_Segment_Controller {
 			do_action( 'edd_segment_track', $uid, $action_desc, $item_details );
 		}
 	}
+
+	public static function track_subscription_changes( $sub_id = 0, $subscription ) {
+
+		if ( ! class_exists( 'EDD_Subscription' ) ) {
+			return;
+		}
+
+		switch ( $subscription->status ) {
+			case 'completed':
+				$action_desc = 'Subscription Completed';
+				break;
+			case 'expired':
+				$action_desc = 'Subscription Expired';
+				break;
+			case 'failing':
+				$action_desc = 'Subscription Failing';
+				break;
+			case 'cancelled':
+				$action_desc = 'Subscription Cancelled';
+				break;
+
+			default:
+				$action_desc = 'Subscription ' . $subscription->status;
+				break;
+		}
+
+		$product = edd_get_download( $subscription->product_id );
+
+		$product_details = json_decode( json_encode( $product ), true );
+		$sub_details = json_decode( json_encode( $subscription ), true );
+
+		$item_details = array(
+				'product_id' => $subscription->product_id,
+				'product_name' => $product->post_title,
+				'recurring_amount' => $subscription->recurring_amount,
+				'initial_amount' => $subscription->initial_amount,
+				'gateway' => $subscription->gateway,
+				//'product_details' => $product_details,
+				//'sub_details' => $sub_details,
+				'renewal_url' => $subscription->get_renew_url(),
+				'time' => time(),
+			);
+
+		$uid = EDD_Segment_Identity::get_uid( $subscription->customer->email );
+
+		do_action( 'edd_segment_track', $uid, $action_desc, $item_details );
+	}
+
+
+	public static function track_subscription_payment_failed( $subscription ) {
+
+		if ( ! class_exists( 'EDD_Subscription' ) ) {
+			return;
+		}
+
+		$product = edd_get_download( $subscription->product_id );
+
+		$product_details = json_decode( json_encode( $product ), true );
+		$sub_details = json_decode( json_encode( $subscription ), true );
+
+		$item_details = array(
+				'product_id' => $subscription->product_id,
+				'product_name' => $product->post_title,
+				'recurring_amount' => $subscription->recurring_amount,
+				'initial_amount' => $subscription->initial_amount,
+				'gateway' => $subscription->gateway,
+				//'product_details' => $product_details,
+				//'sub_details' => $sub_details,
+				'renewal_url' => $subscription->get_renew_url(),
+				'time' => time(),
+			);
+
+		$uid = EDD_Segment_Identity::get_uid( $subscription->customer->email );
+
+		do_action( 'edd_segment_track', $uid, 'Subscription Payment Failed', $item_details );
+	}
+
 
 	/**
 	 * this is a filter so make sure to return what's being filtered. maybe later this can be an action
